@@ -16,7 +16,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useEffect } from "react";
 import Reset from "./Reset";
 
-import {BsDot, BsReddit} from 'react-icons/bs'
 
 type Props = {};
 
@@ -61,7 +60,6 @@ const AuthModal = () => {
             >
               {modalState.view !== "resetPassword" && <OAuthButtons />}
               <AuthInputs />
-              <Reset />
             </Flex>
           </ModalBody>
         </ModalContent>

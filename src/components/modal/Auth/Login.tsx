@@ -100,7 +100,7 @@ const Login = (props: Props) => {
         type="submit"
         isLoading={loading}
       >
-        {" "}
+      
         Log in
       </Button>
       <Flex  justifyContent="center" pt="3">
