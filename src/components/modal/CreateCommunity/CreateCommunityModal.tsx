@@ -18,9 +18,10 @@ import {
 import React, { useEffect, useState } from "react";
 import { BsFillEyeFill, BsFillPersonFill } from "react-icons/bs";
 import { HiLockClosed } from "react-icons/hi";
-import {doc,getDoc,setDoc} from 'firebase/firestore'
-import {firestore,auth} from '../../../firebase/clientApp'
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { firestore, auth } from "../../../firebase/clientApp";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { runTransaction } from "firebase/firestore";
 
 type CreateCommunityModalProps = {
   open: boolean;
@@ -34,8 +35,9 @@ const CreateCommunityModal = ({
   const [communityName, setCommunityName] = useState("");
   const [charactersRemaining, setCharactersRemaining] = useState(21);
   const [communityType, setCommunityType] = useState("public");
-  const [error,setError]=useState('')
-  const [user] = useAuthState(auth)
+  const [error, setError] = useState("");
+  const [user] = useAuthState(auth);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length > 21) return;
@@ -44,35 +46,67 @@ const CreateCommunityModal = ({
   };
 
   const checkboxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    
     setCommunityType(e.target.name);
-  }
+  };
 
-  const handleCreateCommunity  = async () => {
+  const handleCreateCommunity = async () => {
     if (error) setError("");
     const format = /[ `!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?~]/;
-    if (format.test(communityName) || communityName.length< 3) {  
-      setError('Community name ')
-      return
+    if (format.test(communityName) || communityName.length < 3) {
+      setError("Community name ");
+      return;
+    }
+    setIsLoading(true);
+
+    try {
+      const communityDocRef = doc(firestore, "communities", communityName);
+
+      // CREATING TRANSACTIONS- these allow to perform multiple operations on the database at once
+      // fail if any operation fails and only succeeed if all operations succeed
+      // this allows to upkeep database integrity
+      // doesnt pollute the database with half completed operations.
+      await runTransaction(firestore, async transaction => {
+        // CHECKING IF COMMUNITY ALREADY EXISTS WITH THE SAME SAME
+        const communityDoc = await transaction.get(communityDocRef);
+        if (communityDoc.exists()) {
+          throw new Error(
+            `Sorry r/${communityName} is taken.Try another name.`
+          );
+        }
+
+        // CREATING COMMUNITY DOCUMENT
+        transaction.set(communityDocRef, {
+          creatorId: user?.uid,
+          createdAt: serverTimestamp(),
+          numberOfMembers: 1,
+          privacyType: communityType,
+        });
+
+        // SECOND OPERATION OF TRANSACTION > CREATING COMMUNITY ON USER DOCUMENT
+        transaction.set(doc(firestore,`users/${user?.uid}/communitySnippets`, communityName),{
+          communityId: communityName,
+          isModerator: true,
+          
+        })
+      });
+    } catch (error: any) {
+      console.log("handleCreateCommunity error", error);
+      setError(error.message);
     }
 
-    const communityDocRef = doc(firestore, "communities", communityName);
-    const communityDoc = await getDoc(communityDocRef);
+    setIsLoading(false);
+  };
 
-    if(communityDoc.exists()){
-      setError(`Sorry r/${communityName} is taken.Try another name.`)
-      return
-    }
-
-    await setDoc(communityDocRef,{
-
-    });
-    
-  }
+  useEffect(() => {
+    setError("");
+    setCommunityName("");
+    setCharactersRemaining(21);
+    setCommunityType("public");
+  }, [open]);
 
   return (
     <>
-      <Modal isOpen={open} onClose={handleClose} size='lg'>
+      <Modal isOpen={open} onClose={handleClose} size="lg">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader
@@ -84,14 +118,8 @@ const CreateCommunityModal = ({
             Create a community
           </ModalHeader>
           <Box px="3">
-          
             <ModalCloseButton />
-            <ModalBody
-              display="flex"
-              flexDirection="column"
-              padding="10px 0px"
-              border="1px solid red"
-            >
+            <ModalBody display="flex" flexDirection="column" padding="10px 0px">
               <Text fontWeight={600} fontSize="15pt">
                 Name
               </Text>
@@ -122,7 +150,9 @@ const CreateCommunityModal = ({
               >
                 {charactersRemaining} Characters remaining.
               </Text>
-              <Text pt='1' color='red' fontSize='9pt '>{error}</Text>
+              <Text pt="1" color="red" fontSize="9pt ">
+                {error}
+              </Text>
               <Box my="4">
                 <Text fontWeight="600" fontSize="15">
                   Community type
@@ -183,16 +213,23 @@ const CreateCommunityModal = ({
             </ModalBody>
           </Box>
 
-          <ModalFooter bg='gray.100' borderRadius="0px 0px 10px 10px">
+          <ModalFooter bg="gray.100" borderRadius="0px 0px 10px 10px">
             <Button
               variant="outline"
-              height='30px'
+              height="30px"
               mr={3}
               onClick={handleClose}
             >
               Cancel
             </Button>
-            <Button variant="solid" height='30px'>Create community</Button>
+            <Button
+              onClick={handleCreateCommunity}
+              variant="solid"
+              height="30px"
+              isLoading={isLoading}
+            >
+              Create community
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
