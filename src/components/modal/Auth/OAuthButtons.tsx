@@ -7,6 +7,8 @@ import {setDoc, collection,doc } from 'firebase/firestore'
 import { firestore } from '@/firebase/clientApp'
 import { User } from 'firebase/auth'
 
+const googleLogo = '/images/googlelogo.png'
+
 
 const OAuthButtons = () => {
 
@@ -33,12 +35,19 @@ const OAuthButtons = () => {
         isLoading={loading}
         onClick={() => signInWithGoogle()}
       >
-        <Image src="images/googlelogo.png" height="20px" mr="2" alt="google" />
+        <Image
+          src='/images/googlelogo.png'
+          height="20px"
+          mr="2"
+          alt="google"
+        />
         Continue with Google
       </Button>
       {error && (
         <Text color="red.500">
-          {error.message === "Firebase: Error (auth/popup-closed-by-user)." ? null : error.message}
+          {error.message === "Firebase: Error (auth/popup-closed-by-user)."
+            ? null
+            : error.message}
         </Text>
       )}
     </Flex>

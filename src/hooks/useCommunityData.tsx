@@ -15,11 +15,15 @@ import {
 import { write } from "fs";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useRecoilState } from "recoil";
+import { authModalState} from "@/atoms/AuthModalAtom";
+
+import { useRecoilState, useSetRecoilState } from "recoil";
 
 function useCommunityData() {
   const [communityStateValue, setCommunityStateValue] =
     useRecoilState(communityState);
+
+  const setAuthModalState = useSetRecoilState(authModalState);
 
   const [user] = useAuthState(auth);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,6 +34,16 @@ function useCommunityData() {
     isJoined: boolean
   ) => {
     // FIRST CASE IS WHEN USER IS NOT SIGNED IN
+
+    if(!user){
+
+      setAuthModalState({
+        isOpen: true,
+        view: "login",
+      });
+      return
+
+    }
 
     // SECOND CASE IS WHEN USER IS SIGNED IN
     if (isJoined) {
