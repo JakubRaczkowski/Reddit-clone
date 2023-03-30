@@ -53,7 +53,7 @@ const TextInputs = ({
       />
       <Flex justify="flex-end">
         <Button
-          disabled={!textInputs.title}
+          isDisabled={!textInputs.title}
           isLoading={loading}
           onClick={createPostHandler}
           height="34px"
