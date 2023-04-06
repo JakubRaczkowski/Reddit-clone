@@ -1,4 +1,9 @@
-import { Community, CommunityState, communityState } from "@/atoms/CommunitiesAtom";
+import { authModalState } from "@/atoms/AuthModalAtom";
+import {
+  Community,
+  CommunityState,
+  communityState,
+} from "@/atoms/CommunitiesAtom";
 import { auth, firestore, storage } from "@/firebase/clientApp";
 import useSelectFile from "@/hooks/useSelectFile";
 import {
@@ -16,7 +21,6 @@ import { updateDoc, doc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import moment from "moment";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { FaReddit } from "react-icons/fa";
@@ -33,31 +37,28 @@ const About = ({ communityData }: AboutProps) => {
   const { selectedFiles, setSelectedFiles, onSelectImage } = useSelectFile();
   const [uploadingImage, setUploadingImage] = useState(false);
   const setCommunityStateValue = useSetRecoilState(communityState);
+  const setAuthModalState = useSetRecoilState(authModalState);
 
   const onUpdateImage = async () => {
-    if(!selectedFiles) return;
+    if (!selectedFiles) return;
     setUploadingImage(true);
     try {
       const imageRef = ref(storage, `communities/${communityData.id}/image`);
       await uploadString(imageRef, selectedFiles, "data_url");
       const downloadURL = await getDownloadURL(imageRef);
       await updateDoc(doc(firestore, "communities", communityData.id), {
-        imageURL:downloadURL
-      }) 
+        imageURL: downloadURL,
+      });
 
-      setCommunityStateValue((prev:CommunityState) => ({
+      setCommunityStateValue((prev: CommunityState) => ({
         ...prev,
         currentCommunity: {
           ...prev.currentCommunity,
           imageURL: downloadURL,
-
         } as Community,
-      }))
-      
-    } catch (error:any) {
-      console.log(error.message, 'onUpdateImage error bruh');
-       
-      
+      }));
+    } catch (error: any) {
+      console.log(error.message, "onUpdateImage error bruh");
     }
     setUploadingImage(false);
   };
@@ -112,11 +113,21 @@ const About = ({ communityData }: AboutProps) => {
               </>
             )}
           </Flex>
-          <Link href={`/r/${communityData.id}/submit`}>
-            <Button mt="3" height="30px">
-              Create post
+
+          {!user ? (
+            <Button mt="3" height="30px" onClick={()=> setAuthModalState({isOpen:true, view:'login'})}>
+              Create Post
             </Button>
-          </Link>
+          ) : (
+            <>
+              <Link href={`/r/${communityData.id}/submit`}>
+                <Button mt="3" height="30px">
+                  Create post
+                </Button>
+              </Link>
+            </>
+          )}
+          
           {user?.uid === communityData.creatorId && (
             <>
               <Divider />

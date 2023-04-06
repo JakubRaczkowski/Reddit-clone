@@ -41,7 +41,7 @@ const Posts = ({ communityData }: PostsProps) => {
         return { id: item.id, ...item.data() };
       });
 
-      setPostStateValue((prev) => ({
+      setPostStateValue(prev => ({
         ...prev,
         posts: posts as unknown as Post[],
       }));
@@ -62,18 +62,26 @@ const Posts = ({ communityData }: PostsProps) => {
         <PostLoader />
       ) : (
         <Stack direction={"column"}>
-          {postStateValue.posts.map((item: Post) => (
-            console.log(item.id,'helloooo its me id'),
-            <PostItem
-              key={item.id}
-              post={item}
-              userIsCreator={item?.creatorId === user?.uid}
-              userVoteValue={postStateValue.postVotes.find(vote => vote.postId === item.id)?.voteValue}
-              onVote={onVote}
-              onDeletePost={onDeletePost}
-              onSelectPost={() => {}}
-            />
-          ))}
+          {postStateValue.posts.map(
+            (item: Post) => (
+              console.log(item.id, "helloooo its me id"),
+              (
+                <PostItem
+                  key={item.id}
+                  post={item}
+                  userIsCreator={item?.creatorId === user?.uid}
+                  userVoteValue={
+                    postStateValue.postVotes.find(
+                      vote => vote.postId === item.id
+                    )?.voteValue
+                  }
+                  onVote={onVote}
+                  onDeletePost={onDeletePost}
+                  onSelectPost={onSelectPost}
+                />
+              )
+            )
+          )}
         </Stack>
       )}
     </>
