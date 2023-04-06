@@ -7,6 +7,7 @@ import { query, collection, where, orderBy, getDocs } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import PostItem from "./PostItem";
+import PostLoader from "./PostLoader";
 
 type PostsProps = {
   communityData: Community;
@@ -40,7 +41,7 @@ const Posts = ({ communityData }: PostsProps) => {
         return { id: item.id, ...item.data() };
       });
 
-      setPostStateValue(prev => ({
+      setPostStateValue((prev) => ({
         ...prev,
         posts: posts as unknown as Post[],
       }));
@@ -56,26 +57,26 @@ const Posts = ({ communityData }: PostsProps) => {
   }, []);
 
   return (
-    <Stack direction={"column"}>
-      {postStateValue.posts.map(item => (
-        <PostItem
-          key={Math.random()}
-          post={item}
-          userIsCreator={item?.creatorId === user?.uid}
-          userVoteValue={undefined}
-          onVote={onVote}
-          onDeletePost={onDeletePost}
-          onSelectPost={() => {}}
-        />
-      ))}
-
-      {/* {error && (
-        <Alert status="error">
-          <AlertIcon />
-          <AlertTitle mr="2">Error while getting posts. </AlertTitle>
-        </Alert>
-      )} */}
-    </Stack>
+    <>
+      {loading ? (
+        <PostLoader />
+      ) : (
+        <Stack direction={"column"}>
+          {postStateValue.posts.map((item: Post) => (
+            console.log(item.id,'helloooo its me id'),
+            <PostItem
+              key={item.id}
+              post={item}
+              userIsCreator={item?.creatorId === user?.uid}
+              userVoteValue={postStateValue.postVotes.find(vote => vote.postId === item.id)?.voteValue}
+              onVote={onVote}
+              onDeletePost={onDeletePost}
+              onSelectPost={() => {}}
+            />
+          ))}
+        </Stack>
+      )}
+    </>
   );
 };
 

@@ -27,8 +27,17 @@ const Header = ({ communityData }: HeaderProps) => {
       <Box height="50%" bg="blue.400" />
       <Flex bg="white" flexGrow={1} justify="center">
         <Flex width="95%" maxWidth="860px">
-          {communityData.imageURL ? (
-            <Image alt="community logo" />
+          {communityStateValue.currentCommunity?.imageURL ? (
+            <Image
+              src={communityStateValue.currentCommunity.imageURL}
+              alt="community logo"
+              borderRadius='full'
+              position='relative'
+              color='blue.500'
+              top='-3'
+              boxSize='66'
+              border='4px solid white'
+            />
           ) : (
             <>
               <Icon
