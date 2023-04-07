@@ -38,7 +38,7 @@ const CommentInput = ({commentText,setCommentText,user,createLoading,onCreateCom
             }}
           />
           <Flex
-            position="absolute"
+            position="relative"
             left="1px"
             right={0.1}
             bottom="1px"
