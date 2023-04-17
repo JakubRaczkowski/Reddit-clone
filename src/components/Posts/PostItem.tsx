@@ -39,6 +39,7 @@ type PostItemProps = {
   ) => void;
   onDeletePost: (post: Post) => Promise<boolean>;
   onSelectPost?: (post: Post) => void;
+  homePage?: boolean;
 };
 
 const PostItem = ({
@@ -48,6 +49,7 @@ const PostItem = ({
   onVote,
   onDeletePost,
   onSelectPost,
+  homePage,
 }: PostItemProps) => {
   const [imageIsLoading, setImageIsLoading] = useState(true);
   const [error, setError] = useState("");

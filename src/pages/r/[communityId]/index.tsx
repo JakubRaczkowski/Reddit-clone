@@ -27,7 +27,7 @@ const CommunityPage = ({ communityData }: CommunityPageProps) => {
       currentCommunity: communityData,
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [communityData]);
 
   if (!communityData) {
     return <NotFound />;

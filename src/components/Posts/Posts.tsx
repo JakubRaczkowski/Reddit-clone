@@ -54,7 +54,7 @@ const Posts = ({ communityData }: PostsProps) => {
   useEffect(() => {
     getPosts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [communityData]);
 
   return (
     <>

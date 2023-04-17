@@ -7,10 +7,15 @@ import { useSetRecoilState } from "recoil";
 import { authModalState } from "@/atoms/AuthModalAtom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/clientApp";
+import useDirectory from "@/hooks/useDirectory";
 
 const CreatePostLink = () => {
   const [user] = useAuthState(auth);
   const setAuthModalState = useSetRecoilState(authModalState);
+
+  const {toggleMenuOpen} = useDirectory();
+
+
 
   const router = useRouter();
   console.log(user,'hello its me user in create post link');
@@ -23,7 +28,12 @@ const CreatePostLink = () => {
        });
     }
     const { communityId } = router.query;
-    router.push(`/r/${communityId}/submit`);
+
+    if(communityId){
+      router.push(`/r/${communityId}/submit`);
+      return 
+    }
+    toggleMenuOpen();
   };
   return (
     <Flex

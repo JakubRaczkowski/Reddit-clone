@@ -49,7 +49,7 @@ const CommentInput = ({commentText,setCommentText,user,createLoading,onCreateCom
           >
             <Button
               height="26px"
-              disabled={!commentText.length}
+              isDisabled ={commentText.length===0}
               isLoading={createLoading}
               onClick={() => onCreateComment(commentText)}
             >
