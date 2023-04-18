@@ -23,7 +23,7 @@ const SubmitPostPage = () => {
         >
           Create a post
         </Box>
-        {user && <NewPostForm user={user} />}{" "}
+        {user && <NewPostForm user={user}  communityImageURL={communityStateValue.currentCommunity?.imageURL}  />}
       </>
       <>
         {communityStateValue.currentCommunity && (

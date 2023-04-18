@@ -42,9 +42,10 @@ export type TabItem = {
 
 type NewPostFormProps = {
   user: User;
+  communityImageURL?: string;
 };
 
-const NewPostForm = ({ user }: NewPostFormProps) => {
+const NewPostForm = ({ user,communityImageURL }: NewPostFormProps) => {
   const [selectedTab, setSelectedTab] = useState(formTabs[0].title);
   const [textInputs, setTextInputs] = useState({
     title: "",
@@ -63,6 +64,7 @@ const NewPostForm = ({ user }: NewPostFormProps) => {
       title: textInputs.title,
       body: textInputs.body,
       communityId: communityId as string,
+      communityImageURL: communityImageURL || "",
       creatorDisplayName: user.email!.split("@")[0],
       creatorId: user.uid as string,
       numberOfComments: 0,

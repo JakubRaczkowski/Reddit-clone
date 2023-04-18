@@ -66,6 +66,7 @@ function useCommunityData() {
       setCommunityStateValue(prev => ({
         ...prev,
         mySnippets: snippets as Array<CommunitySnippet>,
+        snippetsFetched:true 
       }));
 
       setIsLoading(false);
@@ -161,6 +162,7 @@ function useCommunityData() {
         setCommunityStateValue(prev => ({
           ...prev,
           mySnippets: [],
+          snippetsFetched:false
         }));
         return;
       }

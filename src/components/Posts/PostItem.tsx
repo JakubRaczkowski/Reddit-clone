@@ -13,6 +13,7 @@ import {
   AlertTitle,
 } from "@chakra-ui/react";
 import moment from "moment";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
@@ -55,12 +56,12 @@ const PostItem = ({
   const [error, setError] = useState("");
   const [loadingDelete, setLoadingDelete] = useState(false);
   const singlePostPage = !onSelectPost;
-  const router = useRouter()
+  const router = useRouter();
 
   const handleDelete = async (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
-    event.stopPropagation()
+    event.stopPropagation();
     try {
       setLoadingDelete(true);
       const sucess = await onDeletePost(post);
@@ -68,11 +69,11 @@ const PostItem = ({
       if (!sucess) {
         throw new Error("delete failed");
       }
-      
+
       console.log("post was deleted");
 
-      if(singlePostPage){
-        router.push(`/r/${post.communityId}`)
+      if (singlePostPage) {
+        router.push(`/r/${post.communityId}`);
       }
     } catch (error: any) {
       console.log(error, "set Item handle delete error");
@@ -104,7 +105,7 @@ const PostItem = ({
           }
           color={userVoteValue === 1 ? "brand.100" : "gray.400"}
           fontSize="22"
-          onClick={(event) => onVote(event,post, 1, post.communityId)}
+          onClick={event => onVote(event, post, 1, post.communityId)}
           cursor="pointer"
         />
         <Text fontSize="9pt">{post.voteStatus}</Text>
@@ -116,7 +117,7 @@ const PostItem = ({
           }
           color={userVoteValue === -1 ? "#4379ff" : "gray.400"}
           fontSize="22"
-          onClick={(event) => onVote(event,post, -1, post.communityId)}
+          onClick={event => onVote(event, post, -1, post.communityId)}
           cursor="pointer"
         />
       </Flex>
@@ -130,6 +131,34 @@ const PostItem = ({
         <Stack spacing="1" p="10px">
           <Stack direction="row" spacing="0.6" align="center" fontSize="9pt">
             {/* HOME PAGE ? DISPLAY ICON : DONT DISPLAY ICON */}
+            {homePage && (
+              <>
+                {post.communityImageURL ? (
+                  <Image
+                    src={post.communityImageURL}
+                    borderRadius="full"
+                    boxSize="18px"
+                    mr="2"
+                    alt="community image"
+                  />
+                ) : (
+                  <Icon
+                    as={FaReddit}
+                    fontSize="18pt"
+                    mr="1"
+                    color="brand.100"
+                  ></Icon>
+                )}
+                <Link href={`r/${post.communityId}`}>
+                  <Text
+                    fontWeight="700"
+                    _hover={{ textDecoration: "underline" }}
+                    onClick={(event)=>event.stopPropagation()}
+                  >{`r/${post.communityId}`}</Text>{" "}
+                </Link>
+                <Icon as={BsDot} fontSize="8pt" color="gray.500" />
+              </>
+            )}
             <Text>
               Created by u/{post.creatorDisplayName}{" "}
               {moment(new Date(post.createdAt?.seconds * 1000)).fromNow()}
