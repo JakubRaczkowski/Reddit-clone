@@ -98,17 +98,17 @@ const Home: NextPage = () => {
       const postId = postStateValue.posts.map(item => item.id);
       const postVotesQuery = query(
         collection(firestore, `users/${user?.uid}/postVotes`),
-        where('postId', 'in', postId) 
+        where("postId", "in", postId)
       );
       const postVoteDocs = await getDocs(postVotesQuery);
       const postVotes = postVoteDocs.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
-      }))
+      }));
       setPostStateValue(prev => ({
         ...prev,
         postVotes: postVotes as PostVote[],
-      }))
+      }));
     } catch (error) {
       console.log(error, "error in getUserPostVotes");
     }
@@ -117,11 +117,11 @@ const Home: NextPage = () => {
   useEffect(() => {
     if (user && postStateValue.posts.length) getUserPostVotes();
     return () => {
-      setPostStateValue(prev=>({
+      setPostStateValue(prev => ({
         ...prev,
-        postVotes: []
-      }))
-    }
+        postVotes: [],
+      }));
+    };
   }, [user, postStateValue.posts]);
 
   useEffect(() => {
@@ -160,11 +160,13 @@ const Home: NextPage = () => {
           </Stack>
         )}
       </>
-      <Stack spacing='5'>
-      <Recommendations />
-      <Premium />
-      <PersonalHome />
-      </Stack>
+      <>
+        <Stack spacing="5">
+          <Recommendations />
+          <Premium />
+          <PersonalHome />
+        </Stack>
+      </>
     </PageContent>
   );
 };
